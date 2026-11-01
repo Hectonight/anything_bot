@@ -120,7 +120,7 @@ class MinecraftServer:
         ):
             logger.warning("Invalid names or count in player-list response: %r", response)
             raise MinecraftResponseError(response)
-        logger.info("Parsed player list: players=%d", len(names))
+        logger.debug("Parsed player list: players=%d", len(names))
         return names
 
     def list_online_players(self) -> list[str]:

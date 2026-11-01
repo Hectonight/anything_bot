@@ -1,5 +1,6 @@
 """Discord bot startup. Run with: uv run anything-bot"""
 
+import asyncio
 import logging
 import os
 
@@ -9,6 +10,7 @@ from dotenv import load_dotenv
 
 from anything_bot.commands import register_commands
 from anything_bot.mc_cmds import MinecraftServer
+from anything_bot.presence import PresenceMonitor
 
 logger = logging.getLogger(__name__)
 
@@ -32,18 +34,32 @@ async def setup_hook() -> None:
 
 
 @client.event
-async def on_ready() -> None:
-    logger.info("Connected as %s", client.user)
-
-
-@client.event
 async def on_disconnect() -> None:
     logger.info("Discord disconnected")
 
 
-@client.event
-async def on_resumed() -> None:
-    logger.info("Discord session resumed")
+async def _run_bot(token: str, server: MinecraftServer) -> None:
+    monitor = PresenceMonitor(
+        client, server.host, server.port, server.password,
+        server_name=os.getenv("SERVER_NAME", "Anything Server").strip() or "Anything Server",
+    )
+
+    @client.event
+    async def on_ready() -> None:
+        logger.info("Connected as %s", client.user)
+        monitor.invalidate()
+
+    @client.event
+    async def on_resumed() -> None:
+        logger.info("Discord session resumed")
+        monitor.invalidate()
+
+    try:
+        async with client:
+            monitor.start()
+            await client.start(token)
+    finally:
+        await monitor.close()
 
 
 def main() -> None:
@@ -62,7 +78,9 @@ def main() -> None:
         server = MinecraftServer()
         register_commands(tree, server)
         logger.info("Connecting to Discord")
-        client.run(token, log_handler=None)
+        asyncio.run(_run_bot(token, server))
+    except KeyboardInterrupt:
+        logger.info("Shutdown requested")
     except Exception:
         logger.exception("Bot failed")
         raise

@@ -22,6 +22,10 @@ are implemented.
   Add/remove methods verify responses and return whether the whitelist changed.
   `_ThreadedRcon` uses socket timeouts because mcrcon's Unix signals cannot run
   inside the Discord handlers' worker threads.
+- `src/anything_bot/presence.py`: `PresenceMonitor` polls every 10 seconds over its
+  own persistent RCON connection on a dedicated worker. Updates the Playing activity
+  when the count changes; reconnects after failures and cleans up during shutdown.
+  The activity name comes from `SERVER_NAME` in `.env` (default: `Anything Server`).
 - `pyproject.toml`: Project metadata and dependencies (`discord.py`, `mcrcon`,
   and `python-dotenv`).
 - `uv.lock`: Locked dependency versions.

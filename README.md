@@ -16,6 +16,7 @@ Requires Python 3.12+ and [uv](https://docs.astral.sh/uv/).
 
    ```dotenv
    DISCORD_TOKEN=your-bot-token
+   SERVER_NAME=Anything Server
    RCON_HOST=127.0.0.1
    RCON_PORT=25575
    RCON_PASSWORD=your-rcon-password
@@ -44,6 +45,11 @@ uv run anything-bot
 
 Stop with Ctrl+C. Logs appear in the terminal. Commands register globally on startup.
 
+The bot shows "Playing Anything Server" (configured by `SERVER_NAME`) with the player count in its activity
+state, refreshed every 10 seconds
+over its own persistent RCON connection. If the count cannot be retrieved, it shows
+"player count unavailable" with an idle status and retries on the next refresh.
+
 ## Commands
 
 | Command | Does |
@@ -68,3 +74,4 @@ All Python code is in `src/anything_bot/`:
 - `bot.py` - startup, logging, and Discord connection.
 - `commands.py` - slash commands and embeds.
 - `mc_cmds.py` - Minecraft commands, validation, and RCON connections.
+- `presence.py` - live player-count activity and its persistent RCON connection.
