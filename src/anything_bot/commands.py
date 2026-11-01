@@ -41,42 +41,34 @@ def register_commands(tree: app_commands.CommandTree, server: MinecraftServer) -
 
     @whitelist.command(name="add", description="Add a Minecraft player to the whitelist.")
     async def whitelist_add(interaction: discord.Interaction, username: str) -> None:
-        """After authorization, defer privately and call server.add_to_whitelist(username) in a thread.
+        """After authorization, defer publicly and call server.add_to_whitelist(username) in a thread.
 
         Report added versus already whitelisted. MinecraftServer validates the name.
         """
         logger.info("/whitelist add requested: user=%s guild=%s channel=%s username=%r", interaction.user.id, interaction.guild_id, interaction.channel_id, username)
-        await interaction.response.defer(ephemeral=True)
+        await interaction.response.defer(ephemeral=False)
         changed = await asyncio.to_thread(server.add_to_whitelist, username)
         logger.info("/whitelist add result: user=%s username=%r changed=%s", interaction.user.id, username, changed)
         message = f"Added `{username}` to the whitelist." if changed else f"`{username}` is already whitelisted."
         await interaction.followup.send(
-            embed=discord.Embed(title="Whitelist Add", description=message), ephemeral=True
+            embed=discord.Embed(title="Whitelist Add", description=message), ephemeral=False
         )
-        if changed:
-            await interaction.followup.send(
-                embed=discord.Embed(title="Whitelist Add", description=message), ephemeral=False
-            )
         logger.info("/whitelist add replies sent: user=%s", interaction.user.id)
 
     @whitelist.command(name="remove", description="Remove a Minecraft player from the whitelist.")
     async def whitelist_remove(interaction: discord.Interaction, username: str) -> None:
-        """After authorization, defer privately and call server.remove_from_whitelist(username) in a thread.
+        """After authorization, defer publicly and call server.remove_from_whitelist(username) in a thread.
 
         Report removed versus not whitelisted. MinecraftServer validates the name.
         """
         logger.info("/whitelist remove requested: user=%s guild=%s channel=%s username=%r", interaction.user.id, interaction.guild_id, interaction.channel_id, username)
-        await interaction.response.defer(ephemeral=True)
+        await interaction.response.defer(ephemeral=False)
         changed = await asyncio.to_thread(server.remove_from_whitelist, username)
         logger.info("/whitelist remove result: user=%s username=%r changed=%s", interaction.user.id, username, changed)
         message = f"Removed `{username}` from the whitelist." if changed else f"`{username}` is not whitelisted."
         await interaction.followup.send(
-            embed=discord.Embed(title="Whitelist Remove", description=message), ephemeral=True
+            embed=discord.Embed(title="Whitelist Remove", description=message), ephemeral=False
         )
-        if changed:
-            await interaction.followup.send(
-                embed=discord.Embed(title="Whitelist Remove", description=message), ephemeral=False
-            )
         logger.info("/whitelist remove replies sent: user=%s", interaction.user.id)
 
     tree.add_command(whitelist)
@@ -103,7 +95,7 @@ def register_commands(tree: app_commands.CommandTree, server: MinecraftServer) -
     async def on_command_error(
         interaction: discord.Interaction, error: app_commands.AppCommandError
     ) -> None:
-        """Report errors privately, using a follow-up if already deferred/responded."""
+        """Match command visibility, using a follow-up if already deferred/responded."""
         cause = getattr(error, "original", error)
         logger.warning("Command failed: command=%s user=%s guild=%s error=%r", interaction.command.qualified_name if interaction.command else "unknown", interaction.user.id, interaction.guild_id, cause)
         if isinstance(cause, ValueError):
@@ -118,10 +110,13 @@ def register_commands(tree: app_commands.CommandTree, server: MinecraftServer) -
             )
             message = "The command failed. Check the bot logs."
         embed = discord.Embed(title="Command Error", description=message[:4096], color=discord.Color.red())
+        ephemeral = not (
+            interaction.command and interaction.command.qualified_name in ("whitelist add", "whitelist remove")
+        )
         if interaction.response.is_done():
-            await interaction.followup.send(embed=embed, ephemeral=True)
+            await interaction.followup.send(embed=embed, ephemeral=ephemeral)
         else:
-            await interaction.response.send_message(embed=embed, ephemeral=True)
+            await interaction.response.send_message(embed=embed, ephemeral=ephemeral)
         logger.info("Error reply sent: user=%s", interaction.user.id)
 
     logger.info("Registered commands: %s", ", ".join(command.qualified_name for command in tree.walk_commands()))

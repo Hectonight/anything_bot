@@ -57,7 +57,7 @@ Stop with Ctrl+C. Logs appear in the terminal. Commands register globally on sta
 Whitelist commands default to admin-only. The server owner can grant access under
 **Server Settings → Integrations → your bot → Manage → /whitelist**.
 
-Successful whitelist changes are announced publicly. Other replies are private.
+Whitelist add/remove replies, including errors, are public. List/help replies are private.
 Player names must be 3–16 letters, digits, or underscores. Response parsing assumes
 Paper's default English messages.
 

@@ -11,8 +11,8 @@ are implemented.
   the Discord client, and slash command registration. Run with `uv run anything-bot`.
 - `src/anything_bot/commands.py`: `register_commands(tree, server)` registers
   `/online`, `/whitelist add|remove|list`, and `/help`, with private embeds and shared
-  error handling. Successful whitelist changes also post a public embed; unchanged
-  results and errors stay private. Startup passes one `MinecraftServer` instance.
+  error handling. Whitelist add/remove results and errors use a single public reply;
+  list/help replies and errors stay private. Startup passes one `MinecraftServer` instance.
   The entire `/whitelist` group defaults to admin-only; the owner manages role/user
   access through Discord Integrations. No custom authorization checks are used.
 - `src/anything_bot/mc_cmds.py`: `MinecraftServer` stores validated RCON settings
