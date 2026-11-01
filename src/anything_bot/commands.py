@@ -89,11 +89,11 @@ def register_commands(tree: app_commands.CommandTree, server: MinecraftServer) -
         embed = discord.Embed(
             title="Bot Help",
             description=(
-                "`/online` — Show players currently online in Minecraft.\n"
-                "`/whitelist list` — Show whitelisted Minecraft players.\n"
-                "`/whitelist add username` — Add a player to the whitelist.\n"
-                "`/whitelist remove username` — Remove a player from the whitelist.\n"
-                "`/help` — Show this help."
+                "`/online` - Show players currently online in Minecraft.\n"
+                "`/whitelist list` - Show whitelisted Minecraft players.\n"
+                "`/whitelist add username` - Add a player to the whitelist.\n"
+                "`/whitelist remove username` - Remove a player from the whitelist.\n"
+                "`/help` - Show this help."
             ),
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -139,7 +139,7 @@ async def _send_player_list(
         pages[-1] += ("\n" if pages[-1] else "") + name
     for description in pages:
         embed = discord.Embed(
-            title=f"{title} — {len(players)}", description=description or empty_message
+            title=f"{title} - {len(players)}", description=description or empty_message
         )
         await interaction.followup.send(embed=embed, ephemeral=True)
     logger.debug("Sent %d player-list embeds: user=%s players=%d", len(pages), interaction.user.id, len(players))

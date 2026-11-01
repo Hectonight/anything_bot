@@ -65,6 +65,6 @@ Paper's default English messages.
 
 All Python code is in `src/anything_bot/`:
 
-- `bot.py` — startup, logging, and Discord connection.
-- `commands.py` — slash commands and embeds.
-- `mc_cmds.py` — Minecraft commands, validation, and RCON connections.
+- `bot.py` - startup, logging, and Discord connection.
+- `commands.py` - slash commands and embeds.
+- `mc_cmds.py` - Minecraft commands, validation, and RCON connections.
