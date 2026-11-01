@@ -3,11 +3,41 @@
 import logging
 import os
 import re
+import socket
 
 from dotenv import load_dotenv
 from mcrcon import MCRcon
 
 logger = logging.getLogger(__name__)
+
+
+class _ThreadedRcon(MCRcon):
+    """Use socket timeouts instead of mcrcon's main-thread-only Unix signals."""
+
+    def __init__(self, host: str, password: str, port: int, timeout: int) -> None:
+        # MCRcon.__init__ installs a signal handler, so initialize its fields here.
+        self.host = host
+        self.password = password
+        self.port = port
+        self.timeout = timeout
+        self.socket = None
+
+    def connect(self) -> None:
+        self.socket = socket.create_connection((self.host, self.port), timeout=self.timeout)
+        try:
+            self._send(3, self.password)
+        except Exception:
+            self.disconnect()
+            raise
+
+    def _read(self, length: int) -> bytes:
+        data = b""
+        while len(data) < length:
+            chunk = self.socket.recv(length - len(data))
+            if not chunk:
+                raise ConnectionError("Minecraft closed the RCON connection.")
+            data += chunk
+        return data
 
 
 class MinecraftResponseError(ValueError):
@@ -41,7 +71,7 @@ class MinecraftServer:
     def _command(self, command: str) -> str:
         logger.info("RCON command starting: host=%r port=%d command=%r", self.host, self.port, command)
         try:
-            with MCRcon(self.host, self.password, port=self.port, timeout=5) as mc:
+            with _ThreadedRcon(self.host, self.password, port=self.port, timeout=5) as mc:
                 logger.debug("RCON connected and authenticated")
                 response = mc.command(command)
                 logger.debug("RCON response: %r", response)

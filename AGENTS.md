@@ -20,6 +20,8 @@ are implemented.
   player list, or whitelist list call.
   List methods return player names as `list[str]` using Paper's default English responses.
   Add/remove methods verify responses and return whether the whitelist changed.
+  `_ThreadedRcon` uses socket timeouts because mcrcon's Unix signals cannot run
+  inside the Discord handlers' worker threads.
 - `pyproject.toml`: Project metadata and dependencies (`discord.py`, `mcrcon`,
   and `python-dotenv`).
 - `uv.lock`: Locked dependency versions.
