@@ -1,0 +1,26 @@
+# Python and uv environments
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Local credentials; keep the example template tracked
+.env
+.env.*
+!.env.example
+
+# Tool caches and logs
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+*.log
+
+# Editor and OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

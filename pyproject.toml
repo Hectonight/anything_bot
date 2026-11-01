@@ -1,0 +1,22 @@
+[project]
+name = "anything-bot"
+version = "0.1.0"
+description = "Discord bot for simple Minecraft server administration."
+readme = "README.md"
+authors = [
+    { name = "Hectonight", email = "joshuaoring@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "discord-py>=2.7.1",
+    "mcrcon>=0.7.0",
+    "python-dotenv>=1.2.4",
+]
+
+[project.scripts]
+anything-bot = "anything_bot.bot:main"
+
+[build-system]
+requires = ["uv_build>=0.12.3,<0.13.0"]
+build-backend = "uv_build"
+
